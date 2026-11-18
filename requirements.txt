@@ -1,0 +1,15 @@
+# Рабочие зависимости «ИБ ТЕСТ» (Python 3.12, Windows 10/11 x64)
+PySide6>=6.7,<6.10
+python-docx>=1.1
+pypdfium2>=4.30
+pypdf>=4.0
+openpyxl>=3.1
+reportlab>=4.1
+Pillow>=10.3
+cryptography>=42
+# Локальная языковая модель (GGUF). Для Windows ставится готовое колесо:
+#   pip install llama-cpp-python --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu
+# Для NVIDIA GPU — индекс .../whl/cu124 (см. installer\build.ps1, параметр -Gpu cuda).
+llama-cpp-python>=0.3.2
+# Конвертация .doc через установленный Microsoft Word (необязательно; иначе — LibreOffice)
+pywin32>=306; sys_platform == "win32"
