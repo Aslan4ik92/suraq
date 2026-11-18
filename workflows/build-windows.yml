@@ -1,0 +1,46 @@
+# Сборка Setup.exe в облаке GitHub на Windows: Actions → "Build IBTest installer" → Run workflow.
+# Готовый установщик — во вкладке Artifacts запуска (IBTest-installer).
+name: Build IBTest installer
+
+on:
+  workflow_dispatch:
+    inputs:
+      gpu:
+        description: "llama.cpp: cpu или cuda"
+        default: "cpu"
+        required: true
+  push:
+    tags: ["v*"]
+
+jobs:
+  build:
+    runs-on: windows-2022
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Inno Setup
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe")) { choco install innosetup -y --no-progress }
+
+      - name: Build
+        shell: powershell
+        run: |
+          $gpu = "${{ github.event.inputs.gpu }}"
+          if (-not $gpu) { $gpu = "cpu" }
+          .\installer\build.ps1 -Gpu $gpu -Python "python"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: IBTest-installer
+          path: |
+            dist/installer/*.exe
+            build/build.log
+            build/selftest.txt
+          if-no-files-found: warn
